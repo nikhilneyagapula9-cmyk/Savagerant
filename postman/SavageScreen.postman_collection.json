@@ -1,0 +1,419 @@
+{
+  "info": {
+    "_postman_id": "af70bf57-9988-48c6-9caf-6e94fd0a0f10",
+    "name": "SavageScreen — Complaint Headquarters",
+    "description": "Local API collection for accounts, public and personal rant feeds, connections, videos, replies, reactions, reports, and moderation. Start the three-service stack with docker compose up --build first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8081",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "rantId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "personId",
+      "value": "2",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Register account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Account created', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"you@example.com\",\n  \"displayName\": \"Your display name\",\n  \"password\": \"replace-with-12-or-more-characters\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login successful', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"you@example.com\",\n  \"password\": \"replace-with-your-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Current profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rants and feeds",
+      "item": [
+        {
+          "name": "Public spectacle — rant feed",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/feed?scope=public"
+          }
+        },
+        {
+          "name": "My circle of suspects — rant feed",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/feed?scope=connections"
+          }
+        },
+        {
+          "name": "My greatest hits — rant feed",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/feed?scope=mine"
+          }
+        },
+        {
+          "name": "Post a rant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set('rantId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"tech\",\n  \"content\": \"A constructive rant about software reliability.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants"
+          }
+        },
+        {
+          "name": "Like a rant",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/rants/{{rantId}}/like"
+          }
+        },
+        {
+          "name": "React — raw JSON body",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emoji\": \"🔥\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants/{{rantId}}/react"
+          }
+        },
+        {
+          "name": "Read replies",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/rants/{{rantId}}/comments"
+          }
+        },
+        {
+          "name": "Post a reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"A respectful response.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants/{{rantId}}/comments"
+          }
+        },
+        {
+          "name": "Report a rant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set('reportId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"other\",\n  \"details\": \"Optional context for moderators.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants/{{rantId}}/reports"
+          }
+        }
+      ]
+    },
+    {
+      "name": "People and connections",
+      "item": [
+        {
+          "name": "Find people",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/people"
+          }
+        },
+        {
+          "name": "List my connections",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/connections"
+          }
+        },
+        {
+          "name": "Connect to person",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/connections/{{personId}}"
+          }
+        },
+        {
+          "name": "Disconnect from person",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/connections/{{personId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rant & Roll videos",
+      "item": [
+        {
+          "name": "Public screenings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/videos?scope=public"
+          }
+        },
+        {
+          "name": "My circle's footage",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/videos?scope=connections"
+          }
+        },
+        {
+          "name": "My own press releases",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/videos?scope=mine"
+          }
+        },
+        {
+          "name": "Upload a video file",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "video/mp4"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": ""
+              }
+            },
+            "url": "{{baseUrl}}/api/videos?caption=My%20rant%20video",
+            "description": "In Postman, select Body → binary and choose a real MP4, WebM, or MOV file no larger than 50 MB. Set Content-Type to match the selected file. This request is a template; choose the local file after importing."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Moderator — Complaint Appeals Department",
+      "item": [
+        {
+          "name": "Open reports",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/rants/moderation/reports"
+          }
+        },
+        {
+          "name": "Hide reported rant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"hide\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants/moderation/reports/{{reportId}}/resolve"
+          }
+        },
+        {
+          "name": "Dismiss report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"dismiss\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/rants/moderation/reports/{{reportId}}/resolve"
+          }
+        }
+      ]
+    }
+  ]
+}

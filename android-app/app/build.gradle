@@ -1,0 +1,28 @@
+plugins {
+    id 'com.android.application'
+}
+
+def apiBaseUrl = project.findProperty('apiBaseUrl') ?: 'http://10.0.2.2:8081'
+
+android {
+    namespace 'com.savagescreen.mobile'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.savagescreen.mobile'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+        buildConfigField 'String', 'API_BASE_URL', '"' + apiBaseUrl + '"'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}

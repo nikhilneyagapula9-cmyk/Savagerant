@@ -1,0 +1,54 @@
+services:
+  complaint-headquarters:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SAVAGESCREEN_SERVER_ADDRESS: 0.0.0.0
+      SAVAGESCREEN_SOCIAL_GRAPH_URL: http://blame-network:8082
+      SAVAGESCREEN_VIDEO_SERVICE_URL: http://excuse-vault:8083
+      SAVAGESCREEN_DB_URL: jdbc:h2:file:/app/data/savagescreen_db;DB_CLOSE_ON_EXIT=FALSE
+      SAVAGESCREEN_MODERATOR_EMAIL: ${SAVAGESCREEN_MODERATOR_EMAIL:-}
+    ports:
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      blame-network:
+        condition: service_healthy
+      excuse-vault:
+        condition: service_healthy
+    restart: unless-stopped
+
+  blame-network:
+    build:
+      context: services/social-graph-service
+    expose:
+      - "8082"
+    volumes:
+      - social_graph_data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8082/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  excuse-vault:
+    build:
+      context: services/video-service
+    expose:
+      - "8083"
+    volumes:
+      - video_data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8083/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  app_data:
+  social_graph_data:
+  video_data:

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0b10">
+    <title>SavageScreen — SavageRants</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0a0b10;
+            --card: #13151f;
+            --accent: #ff0055;
+            --text: #f0f2f5;
+            --muted: #a0a5b2;
+            --border: #292d3d;
+            --danger: #ff829e;
+            --success: #72e6a2;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
+        button, input, select, textarea { font: inherit; }
+        button { border: 0; border-radius: 8px; padding: 10px 14px; color: white; background: var(--accent); font-weight: 700; cursor: pointer; }
+        button:disabled { opacity: .55; cursor: wait; }
+        input, select, textarea { width: 100%; margin: 5px 0 14px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; background: #090a10; color: var(--text); }
+        textarea { resize: vertical; }
+        label { display: block; color: var(--muted); font-size: .92rem; }
+        .container { width: min(860px, 100%); margin: auto; }
+        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 22px; }
+        h1 { margin: 0; color: var(--accent); font-size: clamp(1.7rem, 6vw, 2.4rem); }
+        h2 { margin: 0 0 14px; font-size: 1.25rem; }
+        p { margin: 6px 0; }
+        .muted { color: var(--muted); }
+        .card { margin: 18px 0; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+        .account-tools { display: flex; align-items: center; gap: 10px; }
+        .secondary { background: #292d3d; }
+        .tabs, .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tabs button { background: #292d3d; }
+        .tabs button.active { background: var(--accent); }
+        .error { min-height: 1.5em; color: var(--danger); }
+        .success { color: var(--success); }
+        .policy { padding: 12px; border-left: 3px solid var(--success); border-radius: 5px; background: #111a17; color: #d7e8dc; }
+        .rant { margin: 14px 0; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: #0d0f17; }
+        .rant-heading { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .9rem; }
+        .category { align-self: flex-start; padding: 2px 8px; border-radius: 20px; background: #292d3d; color: var(--text); }
+        .rant-content { margin: 12px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+        .actions button { background: #292d3d; }
+        .comment { margin: 10px 0 10px 14px; padding: 10px; border-left: 2px solid var(--border); }
+        .comment-form { display: flex; align-items: start; gap: 8px; }
+        .comment-form textarea { margin-bottom: 0; }
+        .comment-form button { flex: 0 0 auto; }
+        .moderation-report { border-color: #b78b35; }
+        .hidden { display: none !important; }
+        @media (max-width: 540px) {
+            body { padding: 12px; }
+            .card { padding: 15px; }
+            header { align-items: flex-start; flex-direction: column; }
+            .comment-form { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <header>
+        <div>
+            <h1>🔥 SavageScreen</h1>
+            <p class="muted">A distributed network for professionally unprofessional opinions.</p>
+        </div>
+        <div class="account-tools">
+            <span id="accountLabel" class="muted">Browsing as guest</span>
+            <button id="logoutButton" class="secondary hidden" type="button">Sign out</button>
+        </div>
+    </header>
+
+    <section id="authCard" class="card">
+        <h2 id="authTitle">Join the conversation</h2>
+        <div class="tabs" aria-label="Account actions">
+            <button id="loginTab" class="active" type="button">Sign in</button>
+            <button id="registerTab" class="secondary" type="button">Create account</button>
+        </div>
+        <form id="authForm">
+            <div id="displayNameField" class="hidden">
+                <label for="displayName">Display name</label>
+                <input id="displayName" name="displayName" maxlength="100" autocomplete="nickname">
+            </div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" minlength="12" maxlength="128" autocomplete="current-password" required>
+            <button id="authSubmit" type="submit">Sign in</button>
+            <p id="authMessage" class="error" role="status"></p>
+        </form>
+    </section>
+
+    <section id="roastCard" class="card hidden">
+        <h2>Screen-time roast</h2>
+        <form id="roastForm">
+            <label for="appName">Distracting app</label>
+            <input id="appName" maxlength="100" required>
+            <label for="durationMinutes">Minutes spent</label>
+            <input id="durationMinutes" type="number" min="1" max="1440" required>
+            <label for="userGoal">Your goal</label>
+            <input id="userGoal" maxlength="255" required>
+            <label for="personalityMode">Style</label>
+            <select id="personalityMode">
+                <option>Savage</option>
+                <option>Passive-Aggressive</option>
+                <option>Corporate HR</option>
+            </select>
+            <button type="submit">Generate roast</button>
+            <p id="roastMessage" role="status"></p>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>The Public Court of Petty Complaints</h2>
+        <p class="policy"><strong>Community rules:</strong> Criticize ideas and systems, not people's identity. Threats, encouragement of self-harm, and sharing or threatening to share private information are blocked. Ordinary disagreement and strong criticism are welcome.</p>
+        <div id="composePanel" class="hidden">
+            <form id="rantForm">
+                <label for="category">Category</label>
+                <select id="category">
+                    <option value="corporate">Corporate culture</option>
+                    <option value="tech">Technology</option>
+                    <option value="politics">Politics</option>
+                    <option value="life">Life</option>
+                </select>
+                <label for="content">Your rant</label>
+                <textarea id="content" rows="4" maxlength="1000" required placeholder="Vent about an idea or experience, not a person."></textarea>
+                <button type="submit">Post rant</button>
+                <p id="postMessage" class="error" role="status"></p>
+            </form>
+        </div>
+        <p id="guestPrompt" class="muted">Sign in to post, react, or reply. You can read the feed without an account.</p>
+        <div id="rantFeedScopes" class="tabs" aria-label="Rant feed">
+            <button class="active" type="button" data-feed-scope="public">Public spectacle</button>
+            <button class="requires-auth hidden" type="button" data-feed-scope="connections">My circle of suspects</button>
+            <button class="requires-auth hidden" type="button" data-feed-scope="mine">My greatest hits</button>
+        </div>
+        <div class="actions">
+            <button id="refreshButton" class="secondary" type="button">Refresh feed</button>
+        </div>
+        <div id="rantsFeed" aria-live="polite">Loading rants…</div>
+    </section>
+    <section id="connectionsPanel" class="card hidden">
+        <h2>Professional acquaintances you can blame</h2>
+        <p class="muted">Connect with people to add their posts to your private circle feed.</p>
+        <div id="peopleList"></div>
+    </section>
+    <section id="videoPanel" class="card">
+        <h2>Rant &amp; Roll: the video evidence desk</h2>
+        <p class="policy">Upload only videos you have the right to share. Files are limited to 50 MB and are visible to anyone; video content is not automatically reviewed, so do not upload harmful or private material.</p>
+        <form id="videoForm" class="hidden">
+            <label for="videoCaption">Caption</label>
+            <input id="videoCaption" maxlength="160" required placeholder="A dramatic reading of the meeting invite">
+            <label for="videoFile">Video (MP4, WebM, or MOV; maximum 50 MB)</label>
+            <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime" required>
+            <button id="videoSubmit" type="submit">Submit your evidence</button>
+            <p id="videoMessage" class="error" role="status"></p>
+        </form>
+        <div id="videoFeedScopes" class="tabs" aria-label="Video feed">
+            <button class="active" type="button" data-video-scope="public">Public screenings</button>
+            <button class="requires-auth hidden" type="button" data-video-scope="connections">My circle's footage</button>
+            <button class="requires-auth hidden" type="button" data-video-scope="mine">My own press releases</button>
+        </div>
+        <div id="videosFeed" aria-live="polite">Loading videos…</div>
+    </section>
+    <section id="moderationPanel" class="card hidden">
+        <h2>Moderator review queue</h2>
+        <div id="moderationReports"></div>
+    </section>
+</main>
+
+<script>
+    const API_BASE = `${window.location.origin}/api`;
+    const authCard = document.getElementById('authCard');
+    const authForm = document.getElementById('authForm');
+    const authMessage = document.getElementById('authMessage');
+    const rantsFeed = document.getElementById('rantsFeed');
+    let token = localStorage.getItem('savageScreenToken');
+    let authMode = 'login';
+    let feedScope = 'public';
+    let videoScope = 'public';
+
+    async function api(path, options = {}) {
+        const headers = new Headers(options.headers || {});
+        if (typeof options.body === 'string') headers.set('Content-Type', 'application/json');
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        if (response.status === 204) return null;
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.detail || payload.message || `Request failed (${response.status}).`);
+        return payload;
+    }
+
+    function setAuthenticated(user) {
+        authCard.classList.add('hidden');
+        document.getElementById('accountLabel').textContent = user.displayName;
+        document.getElementById('logoutButton').classList.remove('hidden');
+        document.getElementById('composePanel').classList.remove('hidden');
+        document.getElementById('roastCard').classList.remove('hidden');
+        document.getElementById('connectionsPanel').classList.remove('hidden');
+        document.getElementById('videoForm').classList.remove('hidden');
+        document.querySelectorAll('.requires-auth').forEach(button => button.classList.remove('hidden'));
+        document.getElementById('guestPrompt').classList.add('hidden');
+        loadPeople();
+        loadModerationReports();
+        loadVideos();
+    }
+
+    function setGuest() {
+        token = null;
+        localStorage.removeItem('savageScreenToken');
+        authCard.classList.remove('hidden');
+        document.getElementById('accountLabel').textContent = 'Browsing as guest';
+        document.getElementById('logoutButton').classList.add('hidden');
+        document.getElementById('composePanel').classList.add('hidden');
+        document.getElementById('roastCard').classList.add('hidden');
+        document.getElementById('connectionsPanel').classList.add('hidden');
+        document.getElementById('videoForm').classList.add('hidden');
+        document.querySelectorAll('.requires-auth').forEach(button => button.classList.add('hidden'));
+        document.getElementById('guestPrompt').classList.remove('hidden');
+        setFeedScope('public');
+        setVideoScope('public');
+    }
+
+    function showError(target, error) {
+        target.textContent = error.message || 'Something went wrong. Please try again.';
+    }
+
+    document.getElementById('loginTab').addEventListener('click', () => setAuthMode('login'));
+    document.getElementById('registerTab').addEventListener('click', () => setAuthMode('register'));
+
+    function setAuthMode(mode) {
+        authMode = mode;
+        const registering = mode === 'register';
+        document.getElementById('authTitle').textContent = registering ? 'Create your account' : 'Join the conversation';
+        document.getElementById('displayNameField').classList.toggle('hidden', !registering);
+        document.getElementById('displayName').required = registering;
+        document.getElementById('password').autocomplete = registering ? 'new-password' : 'current-password';
+        document.getElementById('password').minLength = registering ? 12 : 1;
+        document.getElementById('authSubmit').textContent = registering ? 'Create account' : 'Sign in';
+        document.getElementById('loginTab').classList.toggle('active', !registering);
+        document.getElementById('registerTab').classList.toggle('active', registering);
+        document.getElementById('loginTab').classList.toggle('secondary', registering);
+        document.getElementById('registerTab').classList.toggle('secondary', !registering);
+        authMessage.textContent = '';
+    }
+
+    authForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        authMessage.textContent = '';
+        const request = {
+            email: document.getElementById('email').value.trim(),
+            password: document.getElementById('password').value
+        };
+        if (authMode === 'register') request.displayName = document.getElementById('displayName').value.trim();
+        try {
+            const result = await api(`/auth/${authMode === 'register' ? 'register' : 'login'}`, {
+                method: 'POST',
+                body: JSON.stringify(request)
+            });
+            token = result.token;
+            localStorage.setItem('savageScreenToken', token);
+            setAuthenticated(result.user);
+            authForm.reset();
+            await loadRants();
+        } catch (error) {
+            showError(authMessage, error);
+        }
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+        try {
+            await api('/auth/logout', { method: 'POST' });
+        } finally {
+            setGuest();
+            await loadRants();
+        }
+    });
+
+    document.getElementById('rantForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const message = document.getElementById('postMessage');
+        message.textContent = '';
+        try {
+            await api('/rants', {
+                method: 'POST',
+                body: JSON.stringify({
+                    category: document.getElementById('category').value,
+                    content: document.getElementById('content').value.trim()
+                })
+            });
+            document.getElementById('content').value = '';
+            message.textContent = 'Your rant was posted.';
+            message.className = 'success';
+            await loadRants();
+        } catch (error) {
+            message.className = 'error';
+            showError(message, error);
+        }
+    });
+
+    function makeButton(label, action, className = 'secondary') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = className;
+        button.textContent = label;
+        button.addEventListener('click', action);
+        return button;
+    }
+
+    async function performRantAction(action) {
+        try {
+            await action();
+            await loadRants();
+        } catch (error) {
+            window.alert(error.message || 'Could not complete that action.');
+        }
+    }
+
+    async function reportRant(rantId) {
+        const reason = window.prompt('Report reason: harassment, threats, privacy, hate, or other');
+        if (!reason) return;
+        const normalizedReason = reason.trim().toLowerCase();
+        const allowedReasons = ['harassment', 'threats', 'privacy', 'hate', 'other'];
+        if (!allowedReasons.includes(normalizedReason)) {
+            window.alert('Choose harassment, threats, privacy, hate, or other.');
+            return;
+        }
+        const details = window.prompt('Optional details for the moderators (do not include private information).') || '';
+        try {
+            await api(`/rants/${rantId}/reports`, {
+                method: 'POST',
+                body: JSON.stringify({ reason: normalizedReason, details })
+            });
+            window.alert('Report submitted for moderator review.');
+        } catch (error) {
+            window.alert(error.message || 'Could not submit report.');
+        }
+    }
+
+    async function loadModerationReports() {
+        const panel = document.getElementById('moderationPanel');
+        const list = document.getElementById('moderationReports');
+        try {
+            const reports = await api('/rants/moderation/reports');
+            panel.classList.remove('hidden');
+            list.replaceChildren();
+            if (reports.length === 0) {
+                list.textContent = 'No open reports.';
+                return;
+            }
+            reports.forEach(report => {
+                const item = document.createElement('article');
+                item.className = 'rant moderation-report';
+                const summary = document.createElement('p');
+                summary.textContent = `Report ${report.id} · ${report.reason} · reported by ${report.reporterName}`;
+                const content = document.createElement('p');
+                content.textContent = report.rantContent;
+                const details = document.createElement('p');
+                details.className = 'muted';
+                details.textContent = report.details || 'No additional details.';
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+                actions.append(
+                    makeButton('Hide rant', () => resolveReport(report.id, 'hide')),
+                    makeButton('Dismiss report', () => resolveReport(report.id, 'dismiss'))
+                );
+                item.append(summary, content, details, actions);
+                list.append(item);
+            });
+        } catch {
+            panel.classList.add('hidden');
+        }
+    }
+
+    async function resolveReport(reportId, decision) {
+        try {
+            await api(`/rants/moderation/reports/${reportId}/resolve`, {
+                method: 'POST',
+                body: JSON.stringify({ decision })
+            });
+            await loadModerationReports();
+            await loadRants();
+        } catch (error) {
+            window.alert(error.message || 'Could not resolve report.');
+        }
+    }
+
+    async function renderComments(rant, container) {
+        const comments = await api(`/rants/${rant.id}/comments`);
+        comments.forEach(comment => {
+            const item = document.createElement('div');
+            item.className = 'comment';
+            const author = document.createElement('strong');
+            author.textContent = comment.author;
+            const content = document.createElement('p');
+            content.textContent = comment.content;
+            const date = document.createElement('small');
+            date.className = 'muted';
+            date.textContent = new Date(comment.createdAt).toLocaleString();
+            item.append(author, content, date);
+            container.append(item);
+        });
+
+        if (token) {
+            const form = document.createElement('form');
+            form.className = 'comment-form';
+            const input = document.createElement('textarea');
+            input.rows = 2;
+            input.maxLength = 1000;
+            input.required = true;
+            input.placeholder = 'Write a respectful reply…';
+            const submit = document.createElement('button');
+            submit.type = 'submit';
+            submit.textContent = 'Reply';
+            form.append(input, submit);
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                submit.disabled = true;
+                try {
+                    await api(`/rants/${rant.id}/comments`, {
+                        method: 'POST',
+                        body: JSON.stringify({ content: input.value.trim() })
+                    });
+                    await loadRants();
+                } catch (error) {
+                    window.alert(error.message || 'Could not post reply.');
+                    submit.disabled = false;
+                }
+            });
+            container.append(form);
+        }
+    }
+
+    async function loadRants() {
+        rantsFeed.textContent = 'Loading rants…';
+        try {
+            const rants = await api(`/feed?scope=${encodeURIComponent(feedScope)}`);
+            rantsFeed.replaceChildren();
+            if (rants.length === 0) {
+                rantsFeed.textContent = 'No rants yet. Be the first to start a thoughtful conversation.';
+                return;
+            }
+            for (const rant of rants) {
+                const card = document.createElement('article');
+                card.className = 'rant';
+                const heading = document.createElement('div');
+                heading.className = 'rant-heading';
+                const author = document.createElement('strong');
+                author.textContent = rant.author;
+                const category = document.createElement('span');
+                category.className = 'category';
+                category.textContent = rant.category;
+                heading.append(author, category);
+                const content = document.createElement('p');
+                content.className = 'rant-content';
+                content.textContent = rant.content;
+                const date = document.createElement('small');
+                date.className = 'muted';
+                date.textContent = new Date(rant.createdAt).toLocaleString();
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+                if (token) {
+                    actions.append(
+                        makeButton(`👍 ${rant.likes}`, () => performRantAction(() =>
+                            api(`/rants/${rant.id}/like`, { method: 'POST' }))),
+                        makeButton(`🔥 ${rant.reactions?.['🔥'] || 0}`, () => performRantAction(() =>
+                            api(`/rants/${rant.id}/react`, { method: 'POST', body: JSON.stringify({ emoji: '🔥' })}))),
+                        makeButton('Report', () => reportRant(rant.id))
+                    );
+                }
+                const comments = document.createElement('section');
+                const commentTitle = document.createElement('h3');
+                commentTitle.textContent = 'Replies';
+                comments.append(commentTitle);
+                card.append(heading, content, date, actions, comments);
+                rantsFeed.append(card);
+                try {
+                    await renderComments(rant, comments);
+                } catch (error) {
+                    const failure = document.createElement('p');
+                    failure.className = 'error';
+                    failure.textContent = error.message || 'Replies could not be loaded.';
+                    comments.append(failure);
+                }
+            }
+        } catch (error) {
+            rantsFeed.textContent = error.message || 'Could not load the rants feed.';
+        }
+    }
+
+    document.getElementById('refreshButton').addEventListener('click', loadRants);
+    document.querySelectorAll('[data-feed-scope]').forEach(button => button.addEventListener('click', () => {
+        setFeedScope(button.dataset.feedScope);
+        loadRants();
+    }));
+
+    function setFeedScope(scope) {
+        feedScope = scope;
+        document.querySelectorAll('[data-feed-scope]').forEach(button => {
+            const active = button.dataset.feedScope === scope;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+    }
+
+    function setVideoScope(scope) {
+        videoScope = scope;
+        document.querySelectorAll('[data-video-scope]').forEach(button => {
+            const active = button.dataset.videoScope === scope;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+    }
+
+    async function loadPeople() {
+        const list = document.getElementById('peopleList');
+        try {
+            const [people, connections] = await Promise.all([api('/people'), api('/connections')]);
+            list.replaceChildren();
+            if (!people.length) {
+                list.textContent = 'No other registered hecklers yet.';
+                return;
+            }
+            people.forEach(person => {
+                const row = document.createElement('div');
+                row.className = 'rant-heading';
+                const name = document.createElement('strong');
+                name.textContent = person.displayName;
+                const connected = connections.includes(person.id);
+                const button = makeButton(connected ? 'Disconnect (politely)' : 'Add to my circle', async () => {
+                    try {
+                        await api(`/connections/${person.id}`, { method: connected ? 'DELETE' : 'POST' });
+                        await Promise.all([loadPeople(), loadRants(), loadVideos()]);
+                    } catch (error) {
+                        window.alert(error.message || 'Could not update your connections.');
+                    }
+                });
+                row.append(name, button);
+                list.append(row);
+            });
+        } catch (error) {
+            list.textContent = error.message || 'The acquaintance directory is unavailable.';
+        }
+    }
+
+    document.getElementById('videoForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const message = document.getElementById('videoMessage');
+        const file = document.getElementById('videoFile').files[0];
+        message.textContent = '';
+        if (!file || file.size > 50 * 1024 * 1024) {
+            message.textContent = 'Choose a video file no larger than 50 MB.';
+            return;
+        }
+        try {
+            await api(`/videos?caption=${encodeURIComponent(document.getElementById('videoCaption').value.trim())}`, {
+                method: 'POST',
+                headers: { 'Content-Type': file.type },
+                body: await file.arrayBuffer()
+            });
+            event.currentTarget.reset();
+            message.className = 'success';
+            message.textContent = 'Your video evidence is on the public record.';
+            setVideoScope('public');
+            await loadVideos();
+        } catch (error) {
+            message.className = 'error';
+            showError(message, error);
+        }
+    });
+
+    async function loadVideos() {
+        const feed = document.getElementById('videosFeed');
+        feed.textContent = 'Loading video evidence…';
+        try {
+            const videos = await api(`/videos?scope=${encodeURIComponent(videoScope)}`);
+            feed.replaceChildren();
+            if (!videos.length) {
+                feed.textContent = 'No video evidence yet. The camera is waiting for your close-up.';
+                return;
+            }
+            videos.forEach(video => {
+                const card = document.createElement('article');
+                card.className = 'rant';
+                const heading = document.createElement('strong');
+                heading.textContent = `${video.author} · ${video.caption}`;
+                const player = document.createElement('video');
+                player.controls = true;
+                player.preload = 'metadata';
+                player.playsInline = true;
+                player.src = video.contentUrl;
+                player.setAttribute('aria-label', `Video rant from ${video.author}`);
+                player.style.width = '100%';
+                player.style.maxHeight = '480px';
+                const date = document.createElement('small');
+                date.className = 'muted';
+                date.textContent = new Date(video.createdAt).toLocaleString();
+                card.append(heading, player, date);
+                feed.append(card);
+            });
+        } catch (error) {
+            feed.textContent = error.message || 'The video service is unavailable.';
+        }
+    }
+
+    document.querySelectorAll('[data-video-scope]').forEach(button => button.addEventListener('click', () => {
+        setVideoScope(button.dataset.videoScope);
+        loadVideos();
+    }));
+
+    document.getElementById('roastForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const output = document.getElementById('roastMessage');
+        output.textContent = '';
+        try {
+            const result = await api('/roasts/generate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    appName: document.getElementById('appName').value.trim(),
+                    durationMinutes: Number(document.getElementById('durationMinutes').value),
+                    userGoal: document.getElementById('userGoal').value.trim(),
+                    personalityMode: document.getElementById('personalityMode').value
+                })
+            });
+            output.textContent = result.roastMessage;
+        } catch (error) {
+            showError(output, error);
+        }
+    });
+
+    async function restoreSession() {
+        if (!token) {
+            setGuest();
+            return;
+        }
+        try {
+            setAuthenticated(await api('/auth/me'));
+        } catch {
+            setGuest();
+        }
+    }
+
+    restoreSession().finally(() => Promise.all([loadRants(), loadVideos()]));
+</script>
+</body>
+</html>
