@@ -6,8 +6,10 @@ import com.savagescreen.backend.model.RoastHistory;
 import com.savagescreen.backend.model.UserAccount;
 import com.savagescreen.backend.repository.RoastHistoryRepository;
 import com.savagescreen.backend.service.RoastService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,8 +18,11 @@ import java.util.Random;
 @Service
 public class RoastServiceImpl implements RoastService {
 
-    @Autowired
-    private RoastHistoryRepository roastHistoryRepository;
+    private final RoastHistoryRepository roastHistoryRepository;
+
+    public RoastServiceImpl(RoastHistoryRepository roastHistoryRepository) {
+        this.roastHistoryRepository = roastHistoryRepository;
+    }
 
     // Using indexed arguments: %1$d = durationMinutes, %2$s = appName, %3$s = userGoal
     private final List<String> savageTemplates = List.of(
@@ -29,6 +34,7 @@ public class RoastServiceImpl implements RoastService {
     private final Random random = new Random();
 
     @Override
+    @Transactional
     public RoastResponseDTO generateRoast(RoastRequestDTO request, UserAccount user) {
         String template = savageTemplates.get(random.nextInt(savageTemplates.size()));
 
@@ -47,22 +53,22 @@ public class RoastServiceImpl implements RoastService {
         history.setIsFallback(true);
         history.setCreatedAt(now);
 
-        roastHistoryRepository.save(history);
-
-        // Build and return response DTO
-        RoastResponseDTO response = new RoastResponseDTO();
-        response.setRoastMessage(message);
-        response.setAppName(request.getAppName());
-        response.setDurationMinutes(request.getDurationMinutes());
-        response.setPersonalityMode(request.getPersonalityMode());
-        response.setGeneratedAt(now);
-        response.setFallback(true);
-
-        return response;
+        return RoastResponseDTO.from(roastHistoryRepository.save(history));
     }
 
     @Override
-    public List<RoastHistory> getAllRoasts(UserAccount user) {
-        return roastHistoryRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+    @Transactional(readOnly = true)
+    public List<RoastResponseDTO> getAllRoasts(UserAccount user) {
+        return roastHistoryRepository.findByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+                .map(RoastResponseDTO::from)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RoastResponseDTO getRoast(Long id, UserAccount user) {
+        RoastHistory history = roastHistoryRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Roast not found."));
+        return RoastResponseDTO.from(history);
     }
 }

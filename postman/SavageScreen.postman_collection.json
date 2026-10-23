@@ -40,6 +40,11 @@
       "key": "reportId",
       "value": "1",
       "type": "string"
+    },
+    {
+      "key": "roastId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -411,6 +416,59 @@
               }
             },
             "url": "{{baseUrl}}/api/rants/moderation/reports/{{reportId}}/resolve"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roast Lab",
+      "item": [
+        {
+          "name": "Generate and save a roast",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Roast created', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('roastId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appName\": \"Social media\",\n  \"durationMinutes\": 45,\n  \"userGoal\": \"Finish my project\",\n  \"personalityMode\": \"Savage\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/roasts"
+          }
+        },
+        {
+          "name": "My roast history",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/roasts"
+          }
+        },
+        {
+          "name": "Read a saved roast",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/roasts/{{roastId}}"
           }
         }
       ]
