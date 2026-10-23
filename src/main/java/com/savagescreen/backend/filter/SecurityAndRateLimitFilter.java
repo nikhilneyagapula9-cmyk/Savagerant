@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SecurityAndRateLimitFilter extends OncePerRequestFilter {
     private static final long WINDOW_MILLIS = 60_000;
     private static final int LOGIN_LIMIT = 10;
+    private static final int CHAT_LIMIT = 20;
     private static final int WRITE_LIMIT = 60;
     private static final int READ_LIMIT = 240;
     private final ConcurrentHashMap<String, Window> windows = new ConcurrentHashMap<>();
@@ -50,11 +51,15 @@ public class SecurityAndRateLimitFilter extends OncePerRequestFilter {
         if (request.getRequestURI().equals("/api/auth/login") || request.getRequestURI().equals("/api/auth/register")) {
             return LOGIN_LIMIT;
         }
+        if (request.getRequestURI().equals("/api/assistant/chat")) {
+            return CHAT_LIMIT;
+        }
         return "GET".equalsIgnoreCase(request.getMethod()) ? READ_LIMIT : WRITE_LIMIT;
     }
 
     private String limitClass(HttpServletRequest request) {
         if (request.getRequestURI().equals("/api/auth/login") || request.getRequestURI().equals("/api/auth/register")) return "auth";
+        if (request.getRequestURI().equals("/api/assistant/chat")) return "chat";
         return "GET".equalsIgnoreCase(request.getMethod()) ? "read" : "write";
     }
 

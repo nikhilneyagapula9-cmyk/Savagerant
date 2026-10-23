@@ -20,6 +20,9 @@ public class Rant {
     @Column(length = 1000)
     private String content;
 
+    @Column(length = 255)
+    private String imageUrl;
+
     private int likes = 0;
     private int shares = 0;
 
@@ -48,6 +51,9 @@ public class Rant {
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public int getLikes() { return likes; }
     public void setLikes(int likes) { this.likes = likes; }

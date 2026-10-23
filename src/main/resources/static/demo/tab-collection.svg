@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">One More Tab</title>
+  <desc id="desc">A laptop is surrounded by a colorful collection of browser tabs.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#171b3a"/><stop offset="1" stop-color="#301b36"/></linearGradient></defs>
+  <rect width="900" height="520" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui,sans-serif" font-size="18" font-weight="700">
+    <rect x="136" y="138" width="170" height="50" rx="12" fill="#ff6b9a"/><text x="153" y="170" fill="#23121d">tab 1: original task</text>
+    <rect x="341" y="100" width="172" height="50" rx="12" fill="#ffd166"/><text x="358" y="132" fill="#2c2312">tab 12: maybe</text>
+    <rect x="554" y="146" width="193" height="50" rx="12" fill="#68f0e5"/><text x="571" y="178" fill="#102220">tab 47: help</text>
+  </g>
+  <rect x="248" y="225" width="410" height="210" rx="16" fill="#252b40" stroke="#9d8bff" stroke-width="5"/>
+  <rect x="269" y="249" width="368" height="143" rx="8" fill="#111522"/><path d="M218 441h470l-38 24H256z" fill="#9d8bff"/>
+  <text x="304" y="305" fill="#fff" font-family="system-ui,sans-serif" font-size="28" font-weight="700">What was I doing?</text>
+  <text x="55" y="76" fill="#fff" font-family="system-ui,sans-serif" font-size="34" font-weight="800">ONE MORE TAB</text>
+  <text x="55" y="496" fill="#ded8ff" font-family="system-ui,sans-serif" font-size="24">Somewhere in this browser is a plan.</text>
+</svg>

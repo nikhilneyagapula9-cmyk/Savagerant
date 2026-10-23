@@ -18,6 +18,23 @@ For gateway-only development without Docker, run `.\mvnw.cmd spring-boot:run` af
 
 The two Node services use built-in Node APIs and need no npm package installation. These JSON/file stores demonstrate service ownership and isolation; they are not production-grade concurrent databases or scalable video storage. A public deployment should replace them with managed databases/object storage, add upload scanning/transcoding, resilience/observability, request authentication between services, and a proper deployment secret manager.
 
+## Pages and AI help desk
+
+The web app has hash-navigable pages: **The Tribunal** (rants), **My Circle** (connections), **Rant & Roll** (videos), **Roast Lab**, **AI Help Desk**, and **Account**. A moderator page appears only for an account configured as the moderator. The chatbot is at `POST /api/assistant/chat` and its mode is shown by `GET /api/assistant/status`. Without configuration, it runs a small local app-help FAQ and explicitly labels itself `local-demo`; it is not generative AI.
+
+For presentations, startup adds four clearly fictional illustrated rants to the public feed, without creating user accounts or overwriting existing content. They are inserted only once per sample and can be disabled with `SAVAGESCREEN_DEMO_CONTENT_ENABLED=false`. Rant & Roll includes two labeled animated previews alongside uploaded videos; these are presentation artwork, not stored video uploads.
+
+To enable model-powered replies, configure an OpenAI-compatible Chat Completions endpoint and model **in the environment, never in source control**:
+
+```powershell
+$env:SAVAGESCREEN_AI_CHAT_COMPLETIONS_URL = "https://YOUR-PROVIDER/v1/chat/completions"
+$env:SAVAGESCREEN_AI_MODEL = "YOUR-MODEL"
+$env:SAVAGESCREEN_AI_API_KEY = "YOUR-SECRET-KEY"
+docker compose up --build
+```
+
+The provider key may be omitted for a local compatible model server. Restart Compose after changing the settings. Messages and the last few turns of chat are sent to the configured provider; do not submit private or sensitive content. The endpoint is rate-limited, input length is bounded, and the system prompt constrains the assistant to app guidance and safe replies, but model output is not guaranteed accurate or safe.
+
 ## REST API examples
 
 Use Postman **Body → raw → JSON** and set `Content-Type: application/json` for request bodies.

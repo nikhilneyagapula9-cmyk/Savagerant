@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
+  <title id="title">Coffee Has Boundaries</title>
+  <desc id="desc">A coffee mug sits beside a machine that needs cleaning.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#33261e"/><stop offset="1" stop-color="#141a22"/></linearGradient></defs>
+  <rect width="900" height="520" rx="28" fill="url(#bg)"/><circle cx="705" cy="135" r="90" fill="#f4a261" opacity=".1"/>
+  <rect x="188" y="193" width="215" height="193" rx="24" fill="#394355" stroke="#f4a261" stroke-width="5"/>
+  <rect x="224" y="229" width="143" height="52" rx="9" fill="#171b25"/><text x="239" y="263" fill="#ffc078" font-family="system-ui,sans-serif" font-size="19">CLEAN ME</text>
+  <rect x="262" y="301" width="67" height="44" rx="7" fill="#171b25"/><path d="M245 386v21m99-21v21" stroke="#f4a261" stroke-width="6"/>
+  <path d="M490 285h177v131H490q-38-65 0-131" fill="#fff0d9"/><path d="M666 311q90-16 70 51-9 38-70 24" fill="none" stroke="#fff0d9" stroke-width="18"/>
+  <path d="M530 268q-18-34 4-53m43 53q-18-34 4-53" fill="none" stroke="#ffc078" stroke-width="7" stroke-linecap="round"/>
+  <text x="55" y="86" fill="#fff" font-family="system-ui,sans-serif" font-size="34" font-weight="800">BEAN THERE</text>
+  <text x="55" y="475" fill="#ffe0bc" font-family="system-ui,sans-serif" font-size="24">The machine wants me to clean it. Bold request.</text>
+</svg>

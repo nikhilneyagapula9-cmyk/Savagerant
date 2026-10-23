@@ -414,6 +414,41 @@
           }
         }
       ]
+    },
+    {
+      "name": "AI Help Desk",
+      "item": [
+        {
+          "name": "Assistant status",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/assistant/status"
+          }
+        },
+        {
+          "name": "Chat with the office intern",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"How do I see posts from people I follow?\",\n  \"history\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/assistant/chat",
+            "description": "Returns local-demo FAQ answers unless an OpenAI-compatible model URL and model are configured in the gateway environment."
+          }
+        }
+      ]
     }
   ]
 }

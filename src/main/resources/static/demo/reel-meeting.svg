@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">The Meeting That Could Have Been a Memo</title>
+  <desc id="desc">An original illustrated office scene with a mountain of meeting invites.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#32132a"/><stop offset="1" stop-color="#131d32"/></linearGradient></defs>
+  <rect width="1280" height="720" fill="url(#bg)"/><circle cx="1030" cy="180" r="175" fill="#ff0055" opacity=".12"/>
+  <g fill="#20283a" stroke="#ff6b9a" stroke-width="5">
+    <rect x="720" y="145" width="365" height="130" rx="22" transform="rotate(-6 720 145)"/>
+    <rect x="770" y="292" width="365" height="130" rx="22" transform="rotate(5 770 292)"/>
+    <rect x="690" y="445" width="410" height="135" rx="22" transform="rotate(-2 690 445)"/>
+  </g>
+  <g fill="#f0f2f5" font-family="system-ui,sans-serif" font-weight="700" font-size="35">
+    <text x="774" y="220">QUICK SYNC</text><text x="825" y="365">ALIGNMENT</text><text x="754" y="528">FOLLOW-UP SYNC</text>
+  </g>
+  <path d="M246 479h233l62 151H186z" fill="#ff0055"/><circle cx="363" cy="345" r="99" fill="#f1c5a7"/>
+  <path d="M267 333q90-154 190 0" fill="#25202c"/><path d="M314 372h18m66 0h18" stroke="#17151a" stroke-width="12" stroke-linecap="round"/>
+  <path d="M326 421q34-28 68 0" fill="none" stroke="#9e344c" stroke-width="8"/>
+  <text x="72" y="105" fill="#fff" font-family="system-ui,sans-serif" font-size="45" font-weight="800">THE MEETING THAT COULD BE A MEMO</text>
+  <text x="72" y="674" fill="#ffd2df" font-family="system-ui,sans-serif" font-size="32">A SavageScreen original presentation preview</text>
+</svg>
