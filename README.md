@@ -89,7 +89,7 @@ Authorization: Bearer <token>
 }
 ```
 
-Generate a roast with `POST /api/roasts/generate` and JSON fields `appName`, `durationMinutes`, `userGoal`, and `personalityMode`. Roast history is authenticated and scoped to the signed-in account.
+Generate and save a roast with authenticated `POST /api/roasts` and a raw JSON body containing `appName`, `durationMinutes`, `userGoal`, and `personalityMode`; the API returns `201 Created` and a `Location` header for the new roast. Read the signed-in user's roast collection with `GET /api/roasts`, or one roast with `GET /api/roasts/{id}`. The legacy `POST /api/roasts/generate` and `GET /api/roasts/history` routes remain available for existing clients. Roast responses use DTOs and never expose internal user IDs.
 
 Reply with `POST /api/rants/{id}/comments` and `{"content":"A respectful response."}`. React with `POST /api/rants/{id}/react` and `{"emoji":"🔥"}`; the emoji goes in the JSON body, not the URL. Replies can be read from `GET /api/rants/{id}/comments`. Rant creation, replies, likes, reactions, and reports require authentication. Users can report with `POST /api/rants/{id}/reports`, for example `{"reason":"harassment","details":"Optional context"}`. Supported report reasons are `harassment`, `threats`, `privacy`, `hate`, and `other`.
 

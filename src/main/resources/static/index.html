@@ -811,7 +811,7 @@
         const output = document.getElementById('roastMessage');
         output.textContent = '';
         try {
-            const result = await api('/roasts/generate', {
+            const result = await api('/roasts', {
                 method: 'POST',
                 body: JSON.stringify({
                     appName: document.getElementById('appName').value.trim(),

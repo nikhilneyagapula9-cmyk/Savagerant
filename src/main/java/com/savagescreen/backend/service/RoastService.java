@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface RoastService {
     RoastResponseDTO generateRoast(RoastRequestDTO request, UserAccount user);
-    List<RoastHistory> getAllRoasts(UserAccount user);
+    List<RoastResponseDTO> getAllRoasts(UserAccount user);
+    RoastResponseDTO getRoast(Long id, UserAccount user);
 }
